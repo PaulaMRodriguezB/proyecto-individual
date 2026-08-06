@@ -1,0 +1,230 @@
+/* VARIABLES GLOBALES CON ENFOQUE ROSADO PASTEL */
+:root {
+  --color-rosado-principal: #ff6b8b;
+  --color-rosado-suave: rgba(255, 240, 245, 0.8);
+  --color-rosado-hover: #ff477e;
+  --color-sello-rojo: #e11d48;
+  --color-fondo-vidrio: rgba(255, 255, 255, 0.75);
+  --color-borde-vidrio: rgba(255, 255, 255, 0.9);
+  --color-texto-principal: #2d3748;
+}
+
+body {
+  /* Ruta relativa para cargar la imagen en la misma carpeta */
+  background-image: url('imagenfondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--color-texto-principal);
+  padding: 30px 15px;
+}
+
+.contenedor-principal {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ENCABEZADO */
+.encabezado-titulo {
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.titulo-principal {
+  font-family: 'Brush Script MT', cursive, sans-serif;
+  font-size: 2.3rem;
+}
+
+.subtitulo-principal {
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+/* CONTENEDORES CON EFECTO CRISTAL (GLASSMORPHISM) */
+.tarjeta-vidrio {
+  background: var(--color-fondo-vidrio);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-borde-vidrio);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+}
+
+.contenedor-espacio-vacio {
+  min-height: 160px;
+}
+
+/* TÍTULOS Y ETIQUETAS EN LAS TARJETAS DE LA PÁGINA (ROSADOS) */
+.etiqueta-seccion,
+.contenedor-tabla-tareas h5 {
+  color: var(--color-rosado-principal) !important;
+  font-weight: 700;
+}
+
+.contenedor-tabla-tareas h5 i {
+  color: var(--color-rosado-principal) !important;
+}
+
+/* CHECKBOX ROSADO (EN LA TABLA DE TAREAS) */
+.form-check-input {
+  cursor: pointer;
+  border-color: #cbd5e1;
+}
+
+.form-check-input:checked {
+  background-color: var(--color-rosado-principal) !important;
+  border-color: var(--color-rosado-principal) !important;
+  box-shadow: 0 0 5px rgba(255, 107, 139, 0.5);
+}
+
+.form-check-input:focus {
+  border-color: var(--color-rosado-principal);
+  box-shadow: 0 0 0 0.25rem rgba(255, 107, 139, 0.25);
+}
+
+/* BOTÓN SELLO AGREGAR (HANKO) */
+.boton-sello-hanko {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.boton-sello-hanko:hover {
+  transform: scale(1.08);
+}
+
+.circulo-sello {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--color-sello-rojo);
+  color: var(--color-sello-rojo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.texto-sello {
+  font-size: 0.75rem;
+  color: #4a5568;
+  margin-top: 2px;
+}
+
+/* CAMPO DE TEXTO DE ENTRADA RÁPIDA */
+.campo-texto-transparente {
+  background: transparent !important;
+  border: none !important;
+  font-size: 1.05rem;
+  box-shadow: none !important;
+}
+
+/* TABLA DE TAREAS */
+.texto-encabezado-tabla {
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+/* ==========================================
+   MODAL CON EFECTO CRISTAL Y DETALLES ROSADOS
+   ========================================== */
+
+/* CONTENEDOR PRINCIPAL DEL MODAL (GLASSMORPHISM) */
+.tarjeta-modal {
+  background: var(--color-fondo-vidrio) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--color-borde-vidrio) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* TÍTULO PRINCIPAL Y SUBTÍTULOS DEL MODAL EN ROSADO */
+.modal-title,
+.modal-body label {
+  color: var(--color-rosado-principal) !important;
+}
+
+/* INPUTS DEL MODAL */
+.entrada-modal {
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* TARJETAS DE CATEGORÍA */
+.tarjeta-categoria {
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 15px 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tarjeta-categoria:hover {
+  border-color: var(--color-rosado-principal);
+}
+
+.tarjeta-categoria.activo {
+  border-color: var(--color-rosado-principal) !important;
+  background-color: var(--color-rosado-suave) !important;
+}
+
+/* MARCA DE VERIFICACIÓN (CHECK CUADRADO EN ROSADO) */
+.tarjeta-categoria .marca-verificacion {
+  display: none;
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 22px;
+  height: 22px;
+  background-color: var(--color-rosado-principal);
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 13px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(255, 107, 139, 0.4);
+}
+
+.tarjeta-categoria.activo .marca-verificacion {
+  display: flex;
+}
+
+/* BOTONES DE ENERGÍA */
+.boton-energia {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px;
+  color: #475569;
+}
+
+.boton-energia.activo {
+  border-color: var(--color-rosado-principal) !important;
+  background-color: var(--color-rosado-suave) !important;
+}
+
+/* BOTÓN DE CONFIRMACIÓN ROSADO DEGRADADO */
+.boton-rosado-modal {
+  background: linear-gradient(135deg, #ff9ebb 0%, #ff6b8b 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 25px !important;
+  box-shadow: 0 4px 15px rgba(255, 107, 139, 0.4);
+  transition: transform 0.1s ease;
+}
+
+.boton-rosado-modal:hover {
+  transform: translateY(-1px);
+}
