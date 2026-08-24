@@ -233,3 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inicializar vista
   renderizarTareas();
 });
+
+
+//cambiosHtml
