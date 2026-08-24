@@ -1,4 +1,3 @@
-/* VARIABLES GLOBALES CON ENFOQUE ROSADO PASTEL */
 :root {
   --color-rosado-principal: #ff6b8b;
   --color-rosado-suave: rgba(255, 240, 245, 0.8);
@@ -7,10 +6,11 @@
   --color-fondo-vidrio: rgba(255, 255, 255, 0.75);
   --color-borde-vidrio: rgba(255, 255, 255, 0.9);
   --color-texto-principal: #2d3748;
+  --color-verde-progreso: #86efac;
+  --color-verde-fuerte: #4ade80;
 }
 
 body {
-  /* Ruta relativa para cargar la imagen en la misma carpeta */
   background-image: url('imagenfondo.jpg');
   background-size: cover;
   background-position: center;
@@ -27,7 +27,6 @@ body {
   margin: 0 auto;
 }
 
-/* ENCABEZADO */
 .encabezado-titulo {
   color: #ffffff;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -45,7 +44,6 @@ body {
   opacity: 0.95;
 }
 
-/* CONTENEDORES CON EFECTO CRISTAL (GLASSMORPHISM) */
 .tarjeta-vidrio {
   background: var(--color-fondo-vidrio);
   backdrop-filter: blur(12px);
@@ -59,7 +57,6 @@ body {
   min-height: 160px;
 }
 
-/* TÍTULOS Y ETIQUETAS EN LAS TARJETAS DE LA PÁGINA (ROSADOS) */
 .etiqueta-seccion,
 .contenedor-tabla-tareas h5 {
   color: var(--color-rosado-principal) !important;
@@ -70,7 +67,6 @@ body {
   color: var(--color-rosado-principal) !important;
 }
 
-/* CHECKBOX ROSADO (EN LA TABLA DE TAREAS) */
 .form-check-input {
   cursor: pointer;
   border-color: #cbd5e1;
@@ -82,12 +78,6 @@ body {
   box-shadow: 0 0 5px rgba(255, 107, 139, 0.5);
 }
 
-.form-check-input:focus {
-  border-color: var(--color-rosado-principal);
-  box-shadow: 0 0 0 0.25rem rgba(255, 107, 139, 0.25);
-}
-
-/* BOTÓN SELLO AGREGAR (HANKO) */
 .boton-sello-hanko {
   background: transparent;
   border: none;
@@ -119,7 +109,6 @@ body {
   margin-top: 2px;
 }
 
-/* CAMPO DE TEXTO DE ENTRADA RÁPIDA */
 .campo-texto-transparente {
   background: transparent !important;
   border: none !important;
@@ -127,17 +116,66 @@ body {
   box-shadow: none !important;
 }
 
-/* TABLA DE TAREAS */
 .texto-encabezado-tabla {
   font-size: 0.75rem;
   color: #718096;
 }
 
-/* ==========================================
-   MODAL CON EFECTO CRISTAL Y DETALLES ROSADOS
-   ========================================== */
+/* BARRA DE PROGRESO Y SECCIÓN DEVOLVER */
+.bar-progreso-contenedor {
+  width: 100%;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
 
-/* CONTENEDOR PRINCIPAL DEL MODAL (GLASSMORPHISM) */
+.bar-progreso-relleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-verde-progreso) 0%, var(--color-verde-fuerte) 100%);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+
+.item-tarea-hecha {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boton-devolver-verde {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  background-color: var(--color-verde-progreso);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s ease;
+}
+
+.boton-devolver-verde:hover {
+  transform: scale(1.08);
+  background-color: var(--color-verde-fuerte);
+}
+
+.caja-texto-hecha {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  color: #4a5568;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ESTILOS DEL MODAL Y CAMPOS */
 .tarjeta-modal {
   background: var(--color-fondo-vidrio) !important;
   backdrop-filter: blur(12px) !important;
@@ -147,75 +185,17 @@ body {
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
-/* TÍTULO PRINCIPAL Y SUBTÍTULOS DEL MODAL EN ROSADO */
 .modal-title,
 .modal-body label {
   color: var(--color-rosado-principal) !important;
 }
 
-/* INPUTS DEL MODAL */
 .entrada-modal {
   border-radius: 12px;
   border: 1px solid #e2e8f0;
   background-color: rgba(255, 255, 255, 0.85);
 }
 
-/* TARJETAS DE CATEGORÍA */
-.tarjeta-categoria {
-  position: relative;
-  background: rgba(255, 255, 255, 0.9);
-  border: 2px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 15px 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tarjeta-categoria:hover {
-  border-color: var(--color-rosado-principal);
-}
-
-.tarjeta-categoria.activo {
-  border-color: var(--color-rosado-principal) !important;
-  background-color: var(--color-rosado-suave) !important;
-}
-
-/* MARCA DE VERIFICACIÓN (CHECK CUADRADO EN ROSADO) */
-.tarjeta-categoria .marca-verificacion {
-  display: none;
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
-  background-color: var(--color-rosado-principal);
-  color: #ffffff;
-  border-radius: 6px;
-  font-size: 13px;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 5px rgba(255, 107, 139, 0.4);
-}
-
-.tarjeta-categoria.activo .marca-verificacion {
-  display: flex;
-}
-
-/* BOTONES DE ENERGÍA */
-.boton-energia {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 10px;
-  color: #475569;
-}
-
-.boton-energia.activo {
-  border-color: var(--color-rosado-principal) !important;
-  background-color: var(--color-rosado-suave) !important;
-}
-
-/* BOTÓN DE CONFIRMACIÓN ROSADO DEGRADADO */
 .boton-rosado-modal {
   background: linear-gradient(135deg, #ff9ebb 0%, #ff6b8b 100%) !important;
   color: #ffffff !important;

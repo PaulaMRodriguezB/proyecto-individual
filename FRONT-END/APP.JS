@@ -1,139 +1,235 @@
 document.addEventListener('DOMContentLoaded', () => {
-  let tareas = JSON.parse(localStorage.getItem('tareas_sereno')) || [];
-  let categoriaSeleccionada = 'Trabajo';
-  let energiaSeleccionada = 'Fácil';
+  // --- ESTADO LOCAL Y DOM ---
+  let tareas = JSON.parse(localStorage.getItem('tareas_db')) || [];
 
-  // Referencias a elementos del DOM
-  const campoTareaRapida = document.getElementById('campoTareaRapida');
-  const botonAbrirModal = document.getElementById('botonAbrirModal');
-  const modalElemento = new bootstrap.Modal(document.getElementById('modalAgregarTarea'));
-  const formularioModalTarea = document.getElementById('formularioModalTarea');
-  const modalInputTitulo = document.getElementById('modalInputTitulo');
-  const modalInputFecha = document.getElementById('modalInputFecha');
-  const cuerpoTablaTareas = document.getElementById('cuerpoTablaTareas');
+  const modalElement = document.getElementById('modalAgregarTarea');
+  const bsModal = new bootstrap.Modal(modalElement);
 
-  // Asignar fecha de hoy por defecto en el selector
-  const hoy = new Date().toISOString().split('T')[0];
-  if (modalInputFecha) modalInputFecha.value = hoy;
+  const filtroFecha = document.getElementById('filtroFechaCalendario');
+  const btnVerHoy = document.getElementById('btnVerHoy');
+  const cuerpoTabla = document.getElementById('cuerpoTablaTareas');
+  const listaHechas = document.getElementById('listaTareasHechas');
+  const campoRapido = document.getElementById('campoTareaRapida');
+  const btnAbrirModal = document.getElementById('botonAbrirModal');
+  const formModal = document.getElementById('formularioModalTarea');
+  const alertaError = document.getElementById('alertaError');
+  const textoFechaActual = document.getElementById('textoFechaActual');
+  const barraProgreso = document.getElementById('barraProgresoVerde');
+  const textoPorcentaje = document.getElementById('textoPorcentajeCumplimiento');
 
-  // 1. Abrir modal al presionar el sello o botón "Agregar"
-  if (botonAbrirModal) {
-    botonAbrirModal.addEventListener('click', () => {
-      if (campoTareaRapida && campoTareaRapida.value.trim() !== '') {
-        modalInputTitulo.value = campoTareaRapida.value.trim();
-      }
-      modalElemento.show();
-    });
-  }
+  const obtenerFechaHoy = () => new Date().toISOString().split('T')[0];
+  filtroFecha.value = obtenerFechaHoy();
 
-  // 2. Configuración de interacción para Categorías (Tarjetas cuadradas)
-  const contenedorCategorias = document.getElementById('opcionesCategoria');
-  if (contenedorCategorias) {
-    contenedorCategorias.addEventListener('click', (e) => {
-      const tarjeta = e.target.closest('.tarjeta-categoria');
-      if (!tarjeta) return;
+  // --- PASO 2.2: FUNCIÓN EXIGIDA POR SPRINT 1 ---
+  const validFormFieldInput = (data) => {
+    // Paso 2.4: Comprobar por consola
+    console.log("Validando campos del formulario:", data);
 
-      // Quitar clase activo de todas las tarjetas y ponerla en la seleccionada
-      contenedorCategorias.querySelectorAll('.tarjeta-categoria').forEach(el => el.classList.remove('activo'));
-      tarjeta.classList.add('activo');
-      categoriaSeleccionada = tarjeta.dataset.valor;
-    });
-  }
+    // Retorna false si falta algún campo obligatorio (Paso 2.5 Tabla)
+    if (!data.nombre || data.nombre.trim() === '') return false;
+    if (!data.descripcion || data.descripcion.trim() === '') return false;
+    if (!data.fecha || data.fecha.trim() === '') return false;
+    if (!data.estado || data.estado.trim() === '') return false;
 
-  // 3. Configuración de interacción para Nivel de Energía
-  const contenedorEnergia = document.getElementById('opcionesEnergia');
-  if (contenedorEnergia) {
-    contenedorEnergia.addEventListener('click', (e) => {
-      const boton = e.target.closest('.boton-energia');
-      if (!boton) return;
+    return true;
+  };
 
-      // Quitar clase activo de todos los botones y ponerla en el seleccionado
-      contenedorEnergia.querySelectorAll('.boton-energia').forEach(el => el.classList.remove('activo'));
-      boton.classList.add('activo');
-      energiaSeleccionada = boton.dataset.valor;
-    });
-  }
+  // --- LÓGICA RENDERIZAR TAREAS ---
+  const actualizarApp = () => {
+    localStorage.setItem('tareas_db', JSON.stringify(tareas));
+    renderizarTareas();
+  };
 
-  // 4. Guardar tarea al presionar "AGREGAR TAREA" en el modal
-  if (formularioModalTarea) {
-    formularioModalTarea.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const nuevaTarea = {
-        id: Date.now(),
-        titulo: modalInputTitulo.value.trim(),
-        categoria: categoriaSeleccionada,
-        fecha: modalInputFecha.value,
-        energia: energiaSeleccionada,
-        completada: false
-      };
+  const renderizarTareas = () => {
+    const fechaFiltro = filtroFecha.value;
+    textoFechaActual.textContent = fechaFiltro === obtenerFechaHoy() ? 'HOY' : fechaFiltro;
 
-      tareas.push(nuevaTarea);
-      guardarYRenderizar();
+    cuerpoTabla.innerHTML = '';
+    listaHechas.innerHTML = '';
 
-      // Limpiar campos y cerrar modal
-      modalInputTitulo.value = '';
-      if (campoTareaRapida) campoTareaRapida.value = '';
-      modalElemento.hide();
-    });
-  }
+    const tareasDelDia = tareas.filter(t => t.fecha === fechaFiltro);
+    const pendientes = tareasDelDia.filter(t => !t.completada);
+    const completadas = tareasDelDia.filter(t => t.completada);
 
-  // 5. Renderizar lista en la tabla
-  function renderizar() {
-    if (!cuerpoTablaTareas) return;
-    cuerpoTablaTareas.innerHTML = '';
+    // Estadísticas
+    const total = tareasDelDia.length;
+    const porcentaje = total === 0 ? 0 : Math.round((completadas.length / total) * 100);
+    barraProgreso.style.width = `${porcentaje}%`;
+    textoPorcentaje.textContent = `${porcentaje}%`;
 
-    if (tareas.length === 0) {
-      cuerpoTablaTareas.innerHTML = `
+    // Render Tabla Izquierda
+    if (pendientes.length === 0) {
+      cuerpoTabla.innerHTML = `
         <tr>
-          <td colspan="5" class="text-center text-muted py-4">No hay tareas registradas</td>
+          <td colspan="5" class="text-center text-muted py-3" style="font-size:0.85rem;">
+            No hay tareas pendientes para esta fecha.
+          </td>
         </tr>`;
-      return;
+    } else {
+      pendientes.forEach(tarea => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <input type="checkbox" class="form-check-input" onchange="commutarTarea('${tarea.id}')">
+          </td>
+          <td class="fw-semibold">${tarea.nombre}</td>
+          <td class="text-muted small">${tarea.descripcion || '-'}</td>
+          <td><span class="badge bg-light text-dark border">${tarea.fecha}</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-link text-danger p-0" onclick="eliminarTarea('${tarea.id}')">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
+        `;
+        cuerpoTabla.appendChild(tr);
+      });
     }
 
-    tareas.forEach(tarea => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>
-          <input type="checkbox" class="form-check-input" ${tarea.completada ? 'checked' : ''} onclick="alternarTarea(${tarea.id})">
-        </td>
-        <td class="${tarea.completada ? 'text-decoration-line-through text-muted' : 'fw-semibold'}">${tarea.titulo}</td>
-        <td class="small text-muted">${formatearFecha(tarea.fecha)}</td>
-        <td>${obtenerIconoEnergia(tarea.energia)}</td>
-        <td class="text-end">
-          <button class="btn btn-sm text-danger" onclick="eliminarTarea(${tarea.id})"><i class="bi bi-trash"></i></button>
-        </td>
-      `;
-      cuerpoTablaTareas.appendChild(tr);
+    // Render Tareas Hechas
+    if (completadas.length === 0) {
+      listaHechas.innerHTML = `<span class="text-muted small text-center d-block py-2">Sin tareas completadas</span>`;
+    } else {
+      completadas.forEach(tarea => {
+        const item = document.createElement('div');
+        item.className = 'item-tarea-hecha';
+        item.innerHTML = `
+          <button class="boton-devolver-verde" onclick="commutarTarea('${tarea.id}')" title="Devolver a pendientes">
+            <i class="bi bi-arrow-return-left text-white" style="font-size: 11px;"></i>
+          </button>
+          <div class="caja-texto-hecha">${tarea.nombre}</div>
+          <button class="btn btn-sm text-danger p-0" onclick="eliminarTarea('${tarea.id}')"><i class="bi bi-x-lg"></i></button>
+        `;
+        listaHechas.appendChild(item);
+      });
+    }
+  };
+
+  const agregarTarea = (nombre, descripcion, fecha, estado) => {
+    tareas.push({
+      id: Date.now().toString(),
+      nombre,
+      descripcion,
+      fecha,
+      estado,
+      completada: false
     });
-  }
+    actualizarApp();
+  };
 
-  function formatearFecha(fechaTexto) {
-    if (!fechaTexto) return 'Hoy';
-    const partes = fechaTexto.split('-');
-    return `${partes[2]}/${partes[1]}`;
-  }
-
-  function obtenerIconoEnergia(energia) {
-    if (energia === 'Alta') return '<span class="text-danger"><i class="bi bi-lightning-fill"></i><i class="bi bi-lightning-fill"></i><i class="bi bi-lightning-fill"></i></span>';
-    if (energia === 'Media') return '<span class="text-warning"><i class="bi bi-lightning-fill"></i><i class="bi bi-lightning-fill"></i></span>';
-    return '<span class="text-success"><i class="bi bi-lightning-fill"></i></span>';
-  }
-
-  window.alternarTarea = (id) => {
+  window.commutarTarea = (id) => {
     tareas = tareas.map(t => t.id === id ? { ...t, completada: !t.completada } : t);
-    guardarYRenderizar();
+    actualizarApp();
   };
 
   window.eliminarTarea = (id) => {
     tareas = tareas.filter(t => t.id !== id);
-    guardarYRenderizar();
+    actualizarApp();
   };
 
-  function guardarYRenderizar() {
-    localStorage.setItem('tareas_sereno', JSON.stringify(tareas));
-    renderizar();
-  }
+  // --- LÓGICA DEL FORMULARIO Y MUESTRA DE ERRORES (PASO 3) ---
+  formModal.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-  renderizar();
+    // Capturar usando id (Paso 2.3)
+    const datosFormulario = {
+      nombre: document.querySelector('#newTaskNameInput').value,
+      descripcion: document.querySelector('#newTaskDescriptionInput').value,
+      fecha: document.querySelector('#newTaskDueDateInput').value,
+      estado: document.querySelector('#newTaskStatusInput').value
+    };
+
+    // Validar datos
+    if (!validFormFieldInput(datosFormulario)) {
+      alertaError.classList.remove('d-none'); // Mostrar alerta
+    } else {
+      alertaError.classList.add('d-none'); // Ocultar alerta si es correcto
+      
+      agregarTarea(
+        datosFormulario.nombre,
+        datosFormulario.descripcion,
+        datosFormulario.fecha,
+        datosFormulario.estado
+      );
+
+      formModal.reset();
+      bsModal.hide();
+    }
+  });
+
+  // --- TIMER POMODORO ---
+  let tiempoTrabajo = 25 * 60;
+  let tiempoDescanso = 5 * 60;
+  let tiempoRestante = tiempoTrabajo;
+  let timerInterval = null;
+  let enEnfoque = true;
+
+  const pantalla = document.getElementById('pantallaPomodoro');
+  const btnPlayPause = document.getElementById('btnPlayPausePomodoro');
+  const btnReset = document.getElementById('btnResetPomodoro');
+  const iconoPlayPause = document.getElementById('iconoPlayPause');
+  const estadoTexto = document.getElementById('estadoPomodoro');
+
+  const actualizarPantallaPomodoro = () => {
+    const minutos = Math.floor(tiempoRestante / 60);
+    const segundos = tiempoRestante % 60;
+    pantalla.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  };
+
+  btnPlayPause.addEventListener('click', () => {
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      iconoPlayPause.className = 'bi bi-play-fill text-white';
+    } else {
+      iconoPlayPause.className = 'bi bi-pause-fill text-white';
+      timerInterval = setInterval(() => {
+        tiempoRestante--;
+        actualizarPantallaPomodoro();
+
+        if (tiempoRestante <= 0) {
+          clearInterval(timerInterval);
+          timerInterval = null;
+          enEnfoque = !enEnfoque;
+          tiempoRestante = enEnfoque ? tiempoTrabajo : tiempoDescanso;
+          estadoTexto.textContent = enEnfoque ? 'TIEMPO DE ENFOQUE' : 'TIEMPO DE DESCANSO';
+          iconoPlayPause.className = 'bi bi-play-fill text-white';
+          actualizarPantallaPomodoro();
+        }
+      }, 1000);
+    }
+  });
+
+  btnReset.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    enEnfoque = true;
+    tiempoRestante = tiempoTrabajo;
+    estadoTexto.textContent = 'TIEMPO DE ENFOQUE';
+    iconoPlayPause.className = 'bi bi-play-fill text-white';
+    actualizarPantallaPomodoro();
+  });
+
+  // --- EVENTOS ADICIONALES ---
+  campoRapido.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && campoRapido.value.trim() !== '') {
+      agregarTarea(campoRapido.value.trim(), 'Tarea rápida', filtroFecha.value, 'Por Hacer');
+      campoRapido.value = '';
+    }
+  });
+
+  btnAbrirModal.addEventListener('click', () => {
+    document.getElementById('newTaskDueDateInput').value = filtroFecha.value;
+    alertaError.classList.add('d-none');
+    bsModal.show();
+  });
+
+  filtroFecha.addEventListener('change', renderizarTareas);
+
+  btnVerHoy.addEventListener('click', () => {
+    filtroFecha.value = obtenerFechaHoy();
+    renderizarTareas();
+  });
+
+  // Inicializar vista
+  renderizarTareas();
 });
