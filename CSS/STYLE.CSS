@@ -11,7 +11,7 @@
 }
 
 body {
-  background-image: url('imagenfondo.jpg');
+  background-image: url('../imagenfondo.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -207,4 +207,8 @@ body {
 
 .boton-rosado-modal:hover {
   transform: translateY(-1px);
+}
+#contenedor-musica iframe {
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }

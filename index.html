@@ -6,7 +6,7 @@
   <title>Planeador de Tareas - Sprint 1</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="STYLE.CSS">
+ <link rel="stylesheet" href="CSS/STYLE.CSS">
 </head>
 <body>
 
@@ -135,14 +135,143 @@
         </section>
 
         <!-- FILA INFERIOR: REPRODUCTOR DE MÚSICA -->
-        <section id="contenedor-musica" class="tarjeta-vidrio contenedor-espacio-vacio p-3" style="min-height: 140px;">
-          <!-- ESPACIO RESERVADO PARA REPRODUCTOR -->
-        </section>
+<!-- ========================================== -->
+<!-- TARJETA PRINCIPAL: MÚSICA & ENFOQUE       -->
+<!-- ========================================== -->
+<section id="contenedor-musica" class="tarjeta-vidrio p-3 mb-4 rounded-4 shadow-sm">
+  
+  <!-- Encabezado de la Tarjeta -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h6 class="m-0 fw-bold text-uppercase d-flex align-items-center gap-2" style="font-size: 0.85rem; color: #ff758c;">
+      <i class="bi bi-headphones fs-5"></i> MÚSICA & ENFOQUE
+    </h6>
+    <span id="badgeCategoria" class="badge rounded-pill bg-light text-dark border px-3 py-2 fw-bold" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+      MÚSICA CLÁSICA
+    </span>
+  </div>
 
+  <p class="text-muted mb-3" style="font-size: 0.75rem;">Elige un ambiente sonoro para concentrarte</p>
+
+  <div class="row g-3 align-items-center">
+    <!-- Menú Lateral de Categorías Rápida -->
+    <div class="col-md-4 d-flex flex-column gap-2">
+      <button class="btn btn-outline-dark btn-categoria text-start p-2.5 rounded-3 d-flex align-items-center gap-2 active" data-cat="clasica">
+        <i class="bi bi-bank fs-5"></i>
+        <span class="fw-bold" style="font-size: 0.8rem;">Clásica</span>
+      </button>
+      <button class="btn btn-outline-dark btn-categoria text-start p-2.5 rounded-3 d-flex align-items-center gap-2" data-cat="nature">
+        <i class="bi bi-cloud-rain fs-5"></i>
+        <span class="fw-bold" style="font-size: 0.8rem;">Lluvia</span>
+      </button>
+      <button class="btn btn-outline-dark btn-categoria text-start p-2.5 rounded-3 d-flex align-items-center gap-2" data-cat="lofi">
+        <i class="bi bi-music-note fs-5"></i>
+        <span class="fw-bold" style="font-size: 0.8rem;">Lo-Fi</span>
+      </button>
+      <button class="btn btn-outline-dark btn-categoria text-start p-2.5 rounded-3 d-flex align-items-center gap-2" data-cat="jazz">
+        <i class="bi bi-music-note-list fs-5"></i>
+        <span class="fw-bold" style="font-size: 0.8rem;">Saxo Jazz</span>
+      </button>
+    </div>
+
+    <!-- Reproductor Activo (Card Central) -->
+    <div class="col-md-8">
+      <div class="p-3 bg-white rounded-4 shadow-sm border d-flex flex-column gap-3">
+        
+        <!-- Carátula + Info de Canción -->
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-light rounded-3 p-3 d-flex align-items-center justify-content-center text-secondary border" style="width: 60px; height: 60px;">
+            <i class="bi bi-bank fs-2"></i>
+          </div>
+          <div>
+            <h6 id="tituloPista" class="m-0 fw-bold" style="font-size: 0.95rem;">Opera Night</h6>
+            <small id="subtituloPista" class="text-muted d-block" style="font-size: 0.75rem;">Clásica Instrumental</small>
+            <small class="text-success fw-bold d-flex align-items-center gap-1 mt-1" style="font-size: 0.68rem;">
+              <i class="bi bi-bar-chart-fill"></i> En reproducción
+            </small>
+          </div>
+        </div>
+
+        <!-- Barra de Progreso y Tiempos -->
+        <div>
+          <input type="range" id="barraProgreso" class="form-range" value="0" min="0" max="100" style="height: 4px;">
+          <div class="d-flex justify-content-between text-muted fw-bold" style="font-size: 0.7rem;">
+            <span id="tiempoActual">00:00</span>
+            <span id="duracionTotal">03:45</span>
+          </div>
+        </div>
+
+        <!-- Botones de Control Principal -->
+        <div class="d-flex justify-content-center align-items-center gap-3">
+          <button class="btn btn-link text-muted p-0"><i class="bi bi-shuffle fs-5"></i></button>
+          <button class="btn btn-link text-dark p-0"><i class="bi bi-skip-start-fill fs-4"></i></button>
+          <button id="btnPlayPause" class="btn btn-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+            <i id="iconoPlay" class="bi bi-play-fill fs-3"></i>
+          </button>
+          <button class="btn btn-link text-dark p-0"><i class="bi bi-skip-end-fill fs-4"></i></button>
+          <button class="btn btn-link text-muted p-0"><i class="bi bi-repeat fs-5"></i></button>
+        </div>
+
+        <!-- Fila Inferior: Control de Volumen + Botón Ver Biblioteca -->
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+          <div class="d-flex align-items-center gap-2 w-50">
+            <i class="bi bi-volume-down text-muted" style="font-size: 0.85rem;"></i>
+            <input type="range" id="volumenAmbiente" class="form-range flex-grow-1" min="0" max="1" step="0.05" value="0.5" style="height: 4px;">
+          </div>
+          <button id="btnAbrirBiblioteca" class="btn btn-light btn-sm rounded-pill border px-3 fw-bold d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+            <i class="bi bi-folder2-open"></i> Ver biblioteca
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Reproductor Nativo Oculto -->
+  <audio id="audioElemento"></audio>
+</section>
+
+
+<!-- ========================================== -->
+<!-- MODAL: BIBLIOTECA DE MÚSICA (VENTANA)    -->
+<!-- ========================================== -->
+<div class="modal fade" id="modalBiblioteca" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      
+      <!-- Encabezado del Modal -->
+      <div class="modal-header border-0 pb-0">
+        <h6 class="modal-title fw-bold text-uppercase" style="color: #ff758c; font-size: 0.85rem; letter-spacing: 0.5px;">
+          BIBLIOTECA DE MÚSICA
+        </h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <!-- Cuerpos de Categorías y Listas de Canciones -->
+      <div class="modal-body p-4">
+        <p class="fw-bold mb-2" style="font-size: 0.8rem; color: #555;">Categorías</p>
+        <div class="d-flex flex-column gap-2 mb-4" id="contenedorCategoriasModal">
+          <!-- Renderizado dinámico de categorías mediante JavaScript -->
+        </div>
+
+        <p class="fw-bold mb-2" style="font-size: 0.8rem; color: #555;">
+          Pistas en <span id="nombreCategoriaSeleccionada" class="text-capitalize">Clásica</span>
+        </p>
+        <div class="list-group list-group-flush border-0" id="contenedorPistasModal">
+          <!-- Renderizado dinámico de canciones mediante JavaScript -->
+        </div>
+      </div>
+
+      <!-- Pie del Modal -->
+      <div class="modal-footer border-0 pt-0 justify-content-center">
+        <button type="button" class="btn btn-dark px-4 py-2 rounded-pill fw-bold" data-bs-dismiss="modal" style="font-size: 0.8rem;">
+          Cerrar
+        </button>
       </div>
 
     </div>
   </div>
+</div>
+
 
   <!-- VENTANA MODAL CON VALIDACIÓN -->
   <div class="modal fade" id="modalAgregarTarea" tabindex="-1" aria-hidden="true">
@@ -199,6 +328,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="APP.JS"></script>
-</body>
+<script src="JS/Task_Manager.js"></script>
+  <script src="JS/APP.JS"></script>
 </html>
