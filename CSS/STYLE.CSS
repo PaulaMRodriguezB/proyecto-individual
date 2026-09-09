@@ -212,3 +212,22 @@ body {
   border: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
+
+/* Footer fijado en la esquina inferior izquierda */
+.footer-esquina {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 9999; /* Asegura que quede por encima de otros elementos */
+  background-color: rgba(33, 37, 41, 0.9); /* Fondo oscuro semitransparente (estilo Bootstrap dark) */
+  color: #ffffff;
+  padding: 8px 12px;
+  border-top-right-radius: 8px; /* Bordes redondeados sutiles */
+  font-size: 0.75rem;
+  box-shadow: 2px -2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.footer-esquina p {
+  margin: 0;
+  line-height: 1.2;
+}
