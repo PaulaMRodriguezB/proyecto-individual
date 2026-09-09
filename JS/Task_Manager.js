@@ -1,16 +1,50 @@
 class TaskManager {
   constructor(currentId = 0) {
-    this.tasks = JSON.parse(localStorage.getItem('tareas_db')) || [];
-    // Si ya existen tareas, aseguramos que currentId tome el valor más alto existente
-    const maxId = this.tasks.reduce((max, task) => Math.max(max, Number(task.id) || 0), 0);
-    this.currentId = maxId > 0 ? maxId : currentId;
+    this.tasks = [];
+    this.currentId = currentId;
   }
 
+  // Tarea 8: Método save()
   save() {
-    localStorage.setItem('tareas_db', JSON.stringify(this.tasks));
+    const tasksJson = JSON.stringify(this.tasks);
+    localStorage.setItem('tasks', tasksJson);
+
+    const currentId = String(this.currentId);
+    localStorage.setItem('currentId', currentId);
   }
 
-  // Tarea 5: Registrar tareas
+  // Tarea 8: Método load()
+  load() {
+    const tasksJson = localStorage.getItem('tasks');
+    if (tasksJson) {
+      try {
+        this.tasks = JSON.parse(tasksJson) || [];
+      } catch (e) {
+        this.tasks = [];
+      }
+    }
+
+    const currentId = localStorage.getItem('currentId');
+    if (currentId) {
+      this.currentId = Number(currentId);
+    } else if (this.tasks.length > 0) {
+      const maxId = this.tasks.reduce((max, task) => Math.max(max, Number(task.id) || 0), 0);
+      this.currentId = maxId;
+    }
+  }
+
+  // Tarea 7: Método getTaskById()
+  getTaskById(taskId) {
+    let foundTask;
+    for (let task of this.tasks) {
+      if (task.id === Number(taskId)) {
+        foundTask = task;
+      }
+    }
+    return foundTask;
+  }
+
+  // Tarea 5: Agregar tarea
   addTask(name, description, dueDate, status = 'PORHACER') {
     this.currentId++;
     const newTask = {
@@ -19,7 +53,7 @@ class TaskManager {
       description: description,
       dueDate: dueDate,
       status: status,
-      completada: false
+      completada: status === 'DONE'
     };
 
     this.tasks.push(newTask);
@@ -27,26 +61,19 @@ class TaskManager {
     return newTask;
   }
 
-  // Tarea 6: Eliminar tarea por ID
+  // Tarea 6: Eliminar tarea
   deleteTask(taskId) {
-    const newTasks = [];
-    for (let task of this.tasks) {
-      if (task.id !== Number(taskId)) {
-        newTasks.push(task);
-      }
-    }
-    this.tasks = newTasks;
+    this.tasks = this.tasks.filter(task => task.id !== Number(taskId));
     this.save();
   }
 
-  // Tarea 4 (Parte 2): Conmutar el estado de completada
+  // Tarea 7 & 8: Cambiar estado
   toggleTaskStatus(taskId) {
-    this.tasks = this.tasks.map(task => {
-      if (task.id === Number(taskId)) {
-        return { ...task, completada: !task.completada };
-      }
-      return task;
-    });
-    this.save();
+    const task = this.getTaskById(taskId);
+    if (task) {
+      task.completada = !task.completada;
+      task.status = task.completada ? 'DONE' : 'PORHACER';
+      this.save();
+    }
   }
 }
