@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // Instancia principal de TaskManager (Tarea 4 & 5)
   const taskManager = new TaskManager();
+  taskManager.load();
 
   // Elementos DOM
   const modalElement = document.getElementById('modalAgregarTarea');
@@ -99,7 +100,9 @@ document.addEventListener('DOMContentLoaded', () => {
         listaHechas.appendChild(item);
       });
     }
+    actualizarOpcionesTareas();
   };
+  
 
   // Delegación de eventos para Eliminar (Tarea 6) y Cambiar estado (Tarea 4)
   document.addEventListener('click', (event) => {
@@ -165,58 +168,190 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // --- TIMER POMODORO ---
-  let tiempoTrabajo = 25 * 60;
-  let tiempoDescanso = 5 * 60;
-  let tiempoRestante = tiempoTrabajo;
-  let timerInterval = null;
-  let enEnfoque = true;
+// --- LÓGICA Y PERSISTENCIA POMODORO ---
+const selectTarea = document.getElementById('selectTareaPomodoro');
 
-  const pantalla = document.getElementById('pantallaPomodoro');
-  const btnPlayPause = document.getElementById('btnPlayPausePomodoro');
-  const btnReset = document.getElementById('btnResetPomodoro');
-  const iconoPlayPause = document.getElementById('iconoPlayPause');
-  const estadoTexto = document.getElementById('estadoPomodoro');
+  const actualizarOpcionesTareas = () => {
+    if (!selectTarea) return;
 
-  const actualizarPantallaPomodoro = () => {
-    const minutos = Math.floor(tiempoRestante / 60);
-    const segundos = tiempoRestante % 60;
-    pantalla.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+    const valorSeleccionado = selectTarea.value;
+    selectTarea.innerHTML = '<option value="">-- Selecciona una tarea activa --</option>';
+
+    if (taskManager && Array.isArray(taskManager.tasks)) {
+      taskManager.tasks.forEach(tarea => {
+        if (!tarea.completada) {
+          const option = document.createElement('option');
+          option.value = tarea.name; 
+          option.textContent = tarea.name;
+          selectTarea.appendChild(option);
+        }
+      });
+    }
+
+    selectTarea.value = valorSeleccionado;
   };
 
-  btnPlayPause.addEventListener('click', () => {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-      iconoPlayPause.className = 'bi bi-play-fill text-white';
-    } else {
-      iconoPlayPause.className = 'bi bi-pause-fill text-white';
-      timerInterval = setInterval(() => {
-        tiempoRestante--;
-        actualizarPantallaPomodoro();
+  if (selectTarea) {
+    selectTarea.addEventListener('focus', actualizarOpcionesTareas);
+  }
+let tiempoTrabajo = 25 * 60;
+let tiempoDescanso = 5 * 60;
+let tiempoRestante = tiempoTrabajo;
+let timerInterval = null;
+let enEnfoque = true;
 
-        if (tiempoRestante <= 0) {
-          clearInterval(timerInterval);
-          timerInterval = null;
-          enEnfoque = !enEnfoque;
-          tiempoRestante = enEnfoque ? tiempoTrabajo : tiempoDescanso;
-          estadoTexto.textContent = enEnfoque ? 'TIEMPO DE ENFOQUE' : 'TIEMPO DE DESCANSO';
-          iconoPlayPause.className = 'bi bi-play-fill text-white';
-          actualizarPantallaPomodoro();
-        }
-      }, 1000);
-    }
-  });
+const pantalla = document.getElementById('pantallaPomodoro');
+const btnPlayPause = document.getElementById('btnPlayPausePomodoro');
+const btnReset = document.getElementById('btnResetPomodoro');
+const iconoPlayPause = document.getElementById('iconoPlayPause');
+const estadoTexto = document.getElementById('estadoPomodoro');
+const btnAbrirResumen = document.getElementById('btnAbrirResumenPomodoro');
 
-  btnReset.addEventListener('click', () => {
+// Obtener fecha actual formato YYYY-MM-DD
+const getFechaHoy = () => new Date().toISOString().split('T')[0];
+
+// Cargar o inicializar datos de Pomodoro en LocalStorage
+const obtenerDatosPomodoro = () => {
+  const datos = JSON.parse(localStorage.getItem('pomodoro_stats')) || {};
+  const hoy = getFechaHoy();
+  if (!datos[hoy]) {
+    datos[hoy] = {
+      segundosEnfoque: 0,
+      sesionesCompletadas: 0,
+      descansosRealizados: 0,
+      historial: []
+    };
+  }
+  return { datos, hoy };
+};
+
+// Registrar tiempo activo en LocalStorage
+const registrarSegundoPomodoro = () => {
+  const { datos, hoy } = obtenerDatosPomodoro();
+  if (enEnfoque) {
+    datos[hoy].segundosEnfoque += 1;
+  }
+  localStorage.setItem('pomodoro_stats', JSON.stringify(datos));
+};
+
+// Actualizar reloj en pantalla
+const actualizarPantallaPomodoro = () => {
+  const minutos = Math.floor(tiempoRestante / 60);
+  const segundos = tiempoRestante % 60;
+  pantalla.textContent = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+};
+
+// Control de Play / Pausa
+// Control de Play / Pausa
+btnPlayPause.addEventListener('click', () => {
+  if (timerInterval) {
     clearInterval(timerInterval);
     timerInterval = null;
-    enEnfoque = true;
-    tiempoRestante = tiempoTrabajo;
-    estadoTexto.textContent = 'TIEMPO DE ENFOQUE';
     iconoPlayPause.className = 'bi bi-play-fill text-white';
-    actualizarPantallaPomodoro();
+  } else {
+    iconoPlayPause.className = 'bi bi-pause-fill text-white';
+    timerInterval = setInterval(() => {
+      tiempoRestante--;
+      registrarSegundoPomodoro(); 
+      actualizarPantallaPomodoro();
+
+      // Guardar sesión al finalizar el tiempo
+      if (tiempoRestante <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+
+        const { datos, hoy } = obtenerDatosPomodoro();
+        const horaFin = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const tareaNombre = (selectTarea && selectTarea.value) ? selectTarea.value : 'Tarea general';
+
+        if (enEnfoque) {
+          datos[hoy].sesionesCompletadas += 1;
+          datos[hoy].historial.push({ 
+            tipo: 'Enfoque', 
+            hora: horaFin, 
+            duracion: '25 min', 
+            tarea: tareaNombre 
+          });
+          enEnfoque = false;
+          tiempoRestante = tiempoDescanso;
+          estadoTexto.textContent = 'TIEMPO DE DESCANSO';
+        } else {
+          datos[hoy].descansosRealizados += 1;
+          datos[hoy].historial.push({ 
+            tipo: 'Descanso', 
+            hora: horaFin, 
+            duracion: '5 min' 
+          });
+          enEnfoque = true;
+          tiempoRestante = tiempoTrabajo;
+          estadoTexto.textContent = 'TIEMPO DE ENFOQUE';
+        }
+
+        localStorage.setItem('pomodoro_stats', JSON.stringify(datos));
+        iconoPlayPause.className = 'bi bi-play-fill text-white';
+        actualizarPantallaPomodoro();
+      }
+    }, 1000);
+  }
+});
+// Control de Reset
+btnReset.addEventListener('click', () => {
+  clearInterval(timerInterval);
+  timerInterval = null;
+  enEnfoque = true;
+  tiempoRestante = tiempoTrabajo;
+  estadoTexto.textContent = 'TIEMPO DE ENFOQUE';
+  iconoPlayPause.className = 'bi bi-play-fill text-white';
+  actualizarPantallaPomodoro();
+});
+
+// Renderizar datos del Modal Resumen
+const renderizarModalResumen = () => {
+  const { datos, hoy } = obtenerDatosPomodoro();
+  const infoHoy = datos[hoy];
+
+  const minutosTrabajados = Math.floor(infoHoy.segundosEnfoque / 60);
+  document.getElementById('minutosEnfoqueAcumulados').textContent = minutosTrabajados;
+  document.getElementById('tiempoTotalActivoTexto').textContent = `${minutosTrabajados} min`;
+  document.getElementById('cantSesionesCompletadas').textContent = infoHoy.sesionesCompletadas;
+  document.getElementById('cantDescansosRealizados').textContent = infoHoy.descansosRealizados;
+
+  // Porcentaje estimado de meta (Ejemplo: Meta diaria 3 sesiones = 75 min)
+  const porcentaje = Math.min(Math.round((infoHoy.segundosEnfoque / (75 * 60)) * 100), 100);
+  document.getElementById('porcentajeEnfoqueCirculo').textContent = `${porcentaje}%`;
+
+  // Renderizar lista de historial
+  const contenedorLista = document.getElementById('contenedorListaSesiones');
+  contenedorLista.innerHTML = '';
+
+  if (infoHoy.historial.length === 0) {
+    contenedorLista.innerHTML = `<span class="text-muted small text-center py-2">No hay sesiones completadas hoy</span>`;
+  } else {
+    infoHoy.historial.forEach((item, index) => {
+      const div = document.createElement('div');
+      div.className = 'd-flex justify-content-between align-items-center p-2 bg-white rounded border-sm';
+      div.style.fontSize = '0.75rem';
+      div.innerHTML = `
+        <div>
+          <span class="fw-bold">${item.tipo === 'Enfoque' ? '🍅 Sesión ' + (index + 1) : '☕ Descanso'}</span>
+          <span class="text-muted ms-2">${item.hora}</span>
+        </div>
+        <span class="badge bg-light text-dark border">${item.duracion}</span>
+      `;
+      contenedorLista.appendChild(div);
+    });
+  }
+};
+
+// Evento Abrir Modal
+if (btnAbrirResumen) {
+  btnAbrirResumen.addEventListener('click', () => {
+    renderizarModalResumen();
+    const modalElemento = document.getElementById('modalResumenPomodoro');
+    const bsModal = bootstrap.Modal.getOrCreateInstance(modalElemento);
+    bsModal.show();
   });
+}
 
   // Eventos de fecha y apertura de Modal
   btnAbrirModal.addEventListener('click', () => {
@@ -506,3 +641,12 @@ function renderizarModal() {
     contenedorPistas.appendChild(itemPista);
   });
 }
+
+
+
+  const renderizarTareas = () => {
+    
+    
+    
+    actualizarOpcionesTareas();
+  };

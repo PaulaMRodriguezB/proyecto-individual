@@ -17,14 +17,21 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
   min-height: 100vh;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column; 
+  font-family: 'Sniglet', cursive, sans-serif;
   color: var(--color-texto-principal);
-  padding: 30px 15px;
+  padding: 30px 0 0 0; 
+  margin: 0;
 }
+@import url('https://fonts.googleapis.com/css2?family=Sniglet:wght@400;800&display=swap');
 
 .contenedor-principal {
   max-width: 1100px;
+  width: 100%;
   margin: 0 auto;
+  padding: 0 15px;
+  flex: 1 0 auto; 
 }
 
 .encabezado-titulo {
@@ -33,7 +40,7 @@ body {
 }
 
 .titulo-principal {
-  font-family: 'Brush Script MT', cursive, sans-serif;
+  font-family: 'Sniglet', cursive, sans-serif;
   font-size: 2.3rem;
 }
 
@@ -54,7 +61,9 @@ body {
 }
 
 .contenedor-espacio-vacio {
-  min-height: 160px;
+  min-height: auto; 
+  flex-grow: 1;     
+  margin-bottom: 1rem;
 }
 
 .etiqueta-seccion,
@@ -63,8 +72,18 @@ body {
   font-weight: 700;
 }
 
-.contenedor-tabla-tareas h5 i {
-  color: var(--color-rosado-principal) !important;
+.contenedor-tabla-tareas {
+  display: flex;
+  flex-direction: column;
+  min-height: 699px; 
+}
+
+
+
+.contenedor-tabla-tareas .table-responsive {
+  flex-grow: 1;
+  overflow-y: auto; 
+  max-height: 350px; 
 }
 
 .form-check-input {
@@ -101,6 +120,37 @@ body {
   font-weight: bold;
   font-size: 1.2rem;
   background-color: rgba(255, 255, 255, 0.6);
+  
+  /* Interacción y animación */
+  cursor: pointer;
+  animation: pulso-sello 1.8s infinite ease-in-out;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+/* Efecto al pasar el cursor o presionar */
+.circulo-sello:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.circulo-sello:active {
+  transform: scale(0.95);
+}
+
+/* Keyframes para la animación sutil de atención */
+@keyframes pulso-sello {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); /* Usa la transparencia de tu rojo */
+  }
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
 }
 
 .texto-sello {
@@ -218,16 +268,159 @@ body {
   position: fixed;
   bottom: 0;
   left: 0;
-  z-index: 9999; /* Asegura que quede por encima de otros elementos */
-  background-color: rgba(33, 37, 41, 0.9); /* Fondo oscuro semitransparente (estilo Bootstrap dark) */
+  z-index: 9999;
+  background-color: rgba(33, 37, 41, 0.9); 
   color: #ffffff;
   padding: 8px 12px;
-  border-top-right-radius: 8px; /* Bordes redondeados sutiles */
+  border-top-right-radius: 8px; 
   font-size: 0.75rem;
   box-shadow: 2px -2px 6px rgba(0, 0, 0, 0.2);
 }
 
-.footer-esquina p {
+.footer-esquina {
+  width: 100%;
+  text-align: center;
+  color: var(--color-texto-principal, #6c757d);
+  font-size: 0.75rem;
+  margin-top: auto; 
+  padding: 15px 0;
+}
+/* ==========================================
+   ESTILOS PARA EL MODAL RESUMEN POMODORO
+   ========================================== */
+
+/* Fondo translúcido con efecto glassmorphism */
+#modalResumenPomodoro .modal-content {
+  background: var(--color-fondo-vidrio) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid var(--color-borde-vidrio) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* Títulos y etiquetas del modal */
+#modalResumenPomodoro .modal-title {
+  color: var(--color-rosado-principal) !important;
+  font-family: inherit;
+}
+
+/* Tarjetas internas del modal */
+.caja-resumen-card {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid var(--color-borde-vidrio) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Botón flotante "Click me" con tomate */
+#btnAbrirResumenPomodoro {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-borde-vidrio);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+#btnAbrirResumenPomodoro:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 12px rgba(255, 107, 139, 0.2);
+}
+
+#btnAbrirResumenPomodoro span {
+  color: var(--color-rosado-principal) !important;
+}
+
+/* Elementos de la lista de historial de sesiones */
+.item-historial-sesion {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: var(--color-texto-principal);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Badge de tiempo en el historial */
+.badge-tiempo-enfoque {
+  background-color: var(--color-rosado-suave) !important;
+  color: var(--color-rosado-principal) !important;
+  border: 1px solid var(--color-rosado-principal);
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+}
+
+/* Círculo indicador de porcentaje */
+.circulo-porcentaje-enfoque {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  border: 4px solid var(--color-rosado-principal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--color-texto-principal);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 10px rgba(255, 107, 139, 0.2);
+}
+
+/* Personalización del scroll de las sesiones */
+#contenedorListaSesiones::-webkit-scrollbar {
+  width: 5px;
+}
+
+#contenedorListaSesiones::-webkit-scrollbar-thumb {
+  background: var(--color-rosado-principal);
+  border-radius: 10px;
+}
+
+#contenedorListaSesiones::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+}
+#contenedor-pomodoro .etiqueta-seccion {
+  margin-top: 1rem !important;
+}
+/* CONTENEDOR PRINCIPAL COMPACTO */
+.footer-container {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 0.3rem 1.2rem;         
+  margin-top: 1.5rem;
+  width: 100%;
+  
+  /* Efecto Vidrio (Glassmorphism) */
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+/* TEXTO (IZQUIERDA) */
+.footer-content p {
+  color: #2d3748;
+  font-weight: 600;
+  font-size: 0.8rem;
   margin: 0;
-  line-height: 1.2;
+}
+
+/* GATO (DERECHA) */
+.footer-pet {
+  width: 50px;  
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-pet dotlottie-player {
+  width: 100%;
+  height: 100%;
 }

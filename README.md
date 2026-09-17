@@ -1,5 +1,4 @@
-
-# 📋 Planificador de Tareas (Task Manager)
+Planificador de Tareas (Task Manager)
 
 Una aplicación web interactiva para gestionar tareas diarias, incluir técnicas de productividad como Pomodoro y escuchar música de ambiente para enfocar el trabajo.
 
